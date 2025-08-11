@@ -1,109 +1,92 @@
 import win32gui
-import win32api
-import win32con
-import win32print
 import pyautogui
 from PIL import ImageGrab
 import pytesseract
 import time
-import mss
-import cv2
+import mss, mss.tools
 import numpy as np
+from datetime import datetime, timedelta, timezone
+
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-# def enum_window_titles():
-#     windows = []
-#     def callback(hwnd, extra):
-#         if win32gui.IsWindowVisible(hwnd):
-#             title = win32gui.GetWindowText(hwnd)
-#             if title:
-#                 windows.append((hwnd, title))
-#     win32gui.EnumWindows(callback, None)
-#     return windows
+# Constants
+# (x, y) or (left, top, right, bottom)
 
-# def get_monitor_for_window(hwnd):
-#     hmonitor = win32api.MonitorFromWindow(hwnd, win32con.MONITOR_DEFAULTTONEAREST)
-#     info = win32api.GetMonitorInfo(hmonitor)
-#     return info
+APP = "BlueStacks App Player"
 
-# this get the middle of the ad gem button
-def get_middle_position_ad_gem():
-    hwnd = win32gui.FindWindow(None, "BlueStacks App Player")
+# seconds
+RETRY_TIME = 120
+
+
+OFFSET_MIDDLE_OF_AD_GEM_BUTTON = (.15, .44)
+OFFSET_AD_GEM_AREA = (.03, .40, .23, .47)
+
+OFFSET_MIDDLE_OF_RETRY_BUTTON = (.25, .74)
+OFFSET_RETRY_BUTTON_AREA = (.09, .71, .45, .77)
+
+OFFSET_MIDDLE_OF_MORE_STATS_BUTTON = (.32, .54)
+OFFSET_MORE_STATS_AREA = (.19, .52, .46, .565)
+
+OFFSET_ROUND_STATS_AREA = (.1, .12, .87, .88)
+OFFSET_ROUND_STATS_BOTTOM = (.5, .83)
+OFFSET_ROUND_STATS_TOP = (.5, .22)
+OFFSET_OUTSIDE_ROUND_STATS = (.5, .08)
+
+OFFSET_DRAG_DISTANCE = .56
+
+OFFSET_RETURN_TO_GAME_AREA = (.17, .92, .8, .97)
+OFFSET_MIDDLE_RETURN_TO_GAME = (.5, .945)
+
+# takes a set of offsets and returns a tuple of coordinates
+def get_coords(app, offsets: tuple) -> tuple:
+    hwnd = win32gui.FindWindow(None, app)
 
     if hwnd:
         rect = win32gui.GetWindowRect(hwnd)
-        
         left, top, right, bottom = rect
         width = right - left
-        x_ad_gem = round(left + (width * .15))
-        y_ad_gem = round(top + (bottom - top) * .44)
 
-        ad_gem_coords = (x_ad_gem, y_ad_gem)
-        return ad_gem_coords
+        if len(offsets) == 2:
+            x = round(left + (width * offsets[0]))
+            y = round(top + (bottom - top) * offsets[1])
+
+            middle_of_area = (x, y)
+            
+            return middle_of_area
+        elif len(offsets) == 4:
+            left_x = round(left + (width * offsets[0]))
+            top_y = round(top + (bottom - top) * offsets[1])
+            right_x = round(left + (width * offsets[2]))
+            bottom_y = round(top + (bottom - top) * offsets[3])
+
+            coords_of_area = (left_x, top_y, right_x, bottom_y)
+            return coords_of_area
+    
+    return ()
+
+
+
+def get_window_dimension(app, dimension):
+    hwnd = win32gui.FindWindow(None, app)
+
+    if hwnd:
+        rect = win32gui.GetWindowRect(hwnd)
     else:
-        return None
+        print("Something went wrong and this window cannot be found")
+    
+    left, top, right, bottom = rect
 
-
-# bbox = (left, top, right, bottom)
-# this gets left, top, right and bottom of the ad gem button
-def get_ad_gem_area():
-    hwnd = win32gui.FindWindow(None, "BlueStacks App Player")
-
-    if hwnd:
-        rect = win32gui.GetWindowRect(hwnd)
-        
-        left, top, right, bottom = rect
+    if dimension == "height":
+        height = bottom - top
+        return height
+    elif dimension == "width":
         width = right - left
-        
-        
-        left_x = round(left + (width * .03))
-        right_x = round(left + (width * .23))
-
-        top_y = round(top + (bottom - top) * .40)
-        bottom_y = round(top + (bottom - top) * .47)
-
-        
-        return (left_x, top_y, right_x, bottom_y)
-
-
-def get_middle_position_retry():
-    hwnd = win32gui.FindWindow(None, "BlueStacks App Player")
-
-    if hwnd:
-        rect = win32gui.GetWindowRect(hwnd)
-        
-        left, top, right, bottom = rect
-        width = right - left
-        x_retry = round(left + (width * .25))
-        y_retry = round(top + (bottom - top) * .74)
-
-        retry_button_middle_coords = (x_retry, y_retry)
-        return retry_button_middle_coords
-
-
-def get_retry_button_area():
-    hwnd = win32gui.FindWindow(None, "BlueStacks App Player")
-
-    if hwnd:
-        rect = win32gui.GetWindowRect(hwnd)
-        
-        left, top, right, bottom = rect
-        width = right - left
-
-        left_x = round(left + (width * .09))
-        top_y = round(top + (bottom - top) * .71)
-        
-        
-        right_x = round(left + (width * .45))
-        bottom_y = round(top + (bottom - top) * .77) 
-
-        return (left_x, top_y, right_x, bottom_y)
+        return width
 
 
 
-
-def capture_region_and_check(coords, text, text_to_find):
+def capture_region_and_check(coords, text, text_to_print):
     if not coords:
         print("Window not found.")
         return False
@@ -116,47 +99,116 @@ def capture_region_and_check(coords, text, text_to_find):
         monitor = {"top": top, "left": left, "width": width, "height": height}
         img = np.array(sct.grab(monitor))
         
-    
-    # gray = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
-
-    
+            
     text_read = pytesseract.image_to_string(img)
     
     if text in text_read.strip():
-        print(f"{text_to_find} Found")
+        print(f"{text_to_print} Found")
         return True
     else:
-        print(f"{text_to_find} NOT Found")
+        print(f"{text_to_print} NOT Found")
         return False
 
-     
+
+
+def take_screen_shot(coords, fname):
+    left, top, right, bottom = coords
+    width = right - left
+    height = bottom - top
+    tz_offset = timezone(timedelta(hours=-6))
+    now = datetime.now(tz_offset).strftime('%Y-%m-%d-%H-%M-%S')
+    
+
+    with mss.mss() as sct:
+        monitor = {"top": top, "left": left, "width": width, "height": height}
+        image = sct.grab(monitor)
+        mss.tools.to_png(image.rgb, image.size, output=f"{fname}_{now}.png")
+
+
+
 
 def main():
     retry_text = "RETRY"
     ad_gem_text = "CLAIM"
+    more_stats_text = "MORE STATS"
+    return_to_game_text = "Tap To Return To Game"
     retry_clicked = 0
     ad_gem_clicked = 0
 
 
     while True:
-        retry_coords = get_retry_button_area()
+        retry_coords = get_coords(APP, OFFSET_RETRY_BUTTON_AREA)
         is_retry_shown = capture_region_and_check(retry_coords, retry_text, "RETRY" )
         
-        if is_retry_shown:
-            retry_button_middle_coords = get_middle_position_retry()
-            pyautogui.moveTo(retry_button_middle_coords)
-            pyautogui.click()
-            retry_clicked += 1
-            print(f"Retry Clicked {retry_clicked} time(s)")
-        elif capture_region_and_check(get_ad_gem_area(), ad_gem_text, "AD GEM CLAIM"):
-            ad_gem_middle = get_middle_position_ad_gem()
+        return_to_game_coords = get_coords(APP, OFFSET_RETURN_TO_GAME_AREA)
+        is_return_to_game_shown = capture_region_and_check(return_to_game_coords, return_to_game_text, "RETURN TO GAME")
+        
+        
+        
+        # check if return to game is show
+        if is_return_to_game_shown:
+            pyautogui.moveTo(get_coords(APP, OFFSET_MIDDLE_RETURN_TO_GAME))
+            pyautogui.click()    
+        # check if retry is shown
+        elif is_retry_shown:
+            more_stats_coords = get_coords(APP, OFFSET_MORE_STATS_AREA)
+            more_stats_shown = capture_region_and_check(more_stats_coords, more_stats_text, "MORE STATS")
+            print(f"MORE STATS SHOW: {more_stats_shown}")
+            if more_stats_shown:
+                # move to more stats button
+                more_stats_coords = get_coords(APP, OFFSET_MIDDLE_OF_MORE_STATS_BUTTON)
+                pyautogui.moveTo(more_stats_coords)
+                pyautogui.click()
+
+                # reset round stats by dragging back up
+                pyautogui.moveTo(get_coords(APP, OFFSET_ROUND_STATS_TOP))
+                height = get_window_dimension(APP, "height")
+                drag_offset = round(height * OFFSET_DRAG_DISTANCE)
+                pyautogui.drag(0, drag_offset, duration=1.5, button="left")
+                pyautogui.moveTo(get_coords(APP, OFFSET_ROUND_STATS_TOP))
+                pyautogui.drag(0, drag_offset, duration=1.5, button="left")
+                
+                # take screen shot
+                time.sleep(2)
+                take_screen_shot(get_coords(APP, OFFSET_ROUND_STATS_AREA), "round_stats")
+                
+                #drag down
+                pyautogui.moveTo(get_coords(APP, OFFSET_ROUND_STATS_BOTTOM))
+                pyautogui.drag(0, -drag_offset, duration=2.5, button="left")
+                time.sleep(2)
+
+                # take another screen shot
+                take_screen_shot(get_coords(APP, OFFSET_ROUND_STATS_AREA), "round_stats")  
+
+                # drag down
+                pyautogui.moveTo(get_coords(APP, OFFSET_ROUND_STATS_BOTTOM))
+                pyautogui.drag(0, -drag_offset, duration=2.5, button="left")
+                time.sleep(2)  
+
+                # take last screen shot
+                take_screen_shot(get_coords(APP, OFFSET_ROUND_STATS_AREA), "round_stats") 
+                
+                # click outside of Round Stats
+                pyautogui.moveTo(get_coords(APP, OFFSET_OUTSIDE_ROUND_STATS))
+                pyautogui.click()
+                # move to retry and click
+                pyautogui.moveTo(get_coords(APP, OFFSET_MIDDLE_OF_RETRY_BUTTON))
+                pyautogui.click()
+
+                
+                
+                retry_clicked += 1
+                print(f"Retry Clicked {retry_clicked} time(s)")
+        # check if ad gem is shown
+        elif capture_region_and_check(get_coords(APP, OFFSET_AD_GEM_AREA), ad_gem_text, "AD GEM CLAIM"):
+            ad_gem_middle = get_coords(APP, OFFSET_MIDDLE_OF_AD_GEM_BUTTON)
             pyautogui.moveTo(ad_gem_middle)
             pyautogui.click()
             ad_gem_clicked += 1
             print(f"Ad Gem Clicked {ad_gem_clicked} time(s)")
         else:
-            print("No Retry or Ad Gem found. Trying again in 120 seconds...")
-        time.sleep(120)
+            print(f"No Retry or Ad Gem found. Trying again in {RETRY_TIME} seconds...")
+        time.sleep(RETRY_TIME)
 
     
     
