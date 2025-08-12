@@ -6,7 +6,7 @@ import time
 import mss, mss.tools
 import numpy as np
 from datetime import datetime, timedelta, timezone
-
+import math
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
@@ -17,7 +17,6 @@ APP = "BlueStacks App Player"
 
 # seconds
 RETRY_TIME = 120
-
 
 OFFSET_MIDDLE_OF_AD_GEM_BUTTON = (.15, .44)
 OFFSET_AD_GEM_AREA = (.03, .40, .23, .47)
@@ -37,6 +36,10 @@ OFFSET_DRAG_DISTANCE = .56
 
 OFFSET_RETURN_TO_GAME_AREA = (.17, .92, .8, .97)
 OFFSET_MIDDLE_RETURN_TO_GAME = (.5, .945)
+
+OFFSET_FLOATIING_DIAMOND_AREA = (.3, .15, .67, .37)
+
+OFFSET_CENTER_OF_TOWER = (.485,.255)
 
 # takes a set of offsets and returns a tuple of coordinates
 def get_coords(app, offsets: tuple) -> tuple:
@@ -76,12 +79,15 @@ def get_window_dimension(app, dimension):
         print("Something went wrong and this window cannot be found")
     
     left, top, right, bottom = rect
-
-    if dimension == "height":
-        height = bottom - top
+    height = bottom - top
+    width = right - left
+    if dimension == "all":
+        return rect, height, width
+    elif dimension == "rect":
+        return rect
+    elif dimension == "height":
         return height
     elif dimension == "width":
-        width = right - left
         return width
 
 
@@ -125,6 +131,20 @@ def take_screen_shot(coords, fname):
         mss.tools.to_png(image.rgb, image.size, output=f"{fname}_{now}.png")
 
 
+def click_circle(bounds, tower_center, radius_px, clicks=8, delay=0.1):
+    
+    rect, height, width =  get_window_dimension(APP, dimension="all")
+    left, top, right, bottom = rect
+    tower_x = left + tower_center[0] * width
+    tower_y = top + tower_center[1] * height
+
+    for i in range(clicks):
+        angle = (2 * math.pi / clicks) * i
+        x = tower_x + math.cos(angle) * radius_px
+        y = tower_y + math.sin(angle) * radius_px
+        pyautogui.moveTo(x, y)
+        pyautogui.click()
+        time.sleep(delay)
 
 
 def main():
@@ -204,6 +224,10 @@ def main():
             ad_gem_middle = get_coords(APP, OFFSET_MIDDLE_OF_AD_GEM_BUTTON)
             pyautogui.moveTo(ad_gem_middle)
             pyautogui.click()
+            rect = get_window_dimension(APP, "rect")
+            height = get_window_dimension(APP, dimension="height")
+            big_radius = height * 0.10  # 20% of window height
+            click_circle(rect, OFFSET_CENTER_OF_TOWER, big_radius, clicks=20, delay=0.001)
             ad_gem_clicked += 1
             print(f"Ad Gem Clicked {ad_gem_clicked} time(s)")
         else:
