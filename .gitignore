@@ -1,4 +1,5 @@
-
+src/__pycache__
 /todo.md
 utility_functions/
 round_stats/
+__pycache__
