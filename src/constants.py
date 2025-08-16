@@ -1,0 +1,72 @@
+from enum import Enum
+
+
+
+
+# (x, y) or (left, top, right, bottom)
+# Constants for the various places in the app
+APP = "BlueStacks App Player 1"
+RETRY_TIME = 120
+
+OFFSET_MIDDLE_OF_RETRY_BUTTON = (.25, .74)
+OFFSET_RETRY_BUTTON_AREA = (.09, .71, .45, .77)
+
+
+OFFSET_MIDDLE_OF_AD_GEM_BUTTON = (.15, .44)
+OFFSET_AD_GEM_AREA = (.03, .40, .23, .47)
+
+
+
+OFFSET_MIDDLE_OF_MORE_STATS_BUTTON = (.32, .54)
+OFFSET_MORE_STATS_AREA = (.19, .52, .46, .565)
+
+OFFSET_ROUND_STATS_AREA = (.1, .12, .87, .88)
+OFFSET_ROUND_STATS_BOTTOM = (.5, .83)
+OFFSET_ROUND_STATS_TOP = (.5, .22)
+OFFSET_OUTSIDE_ROUND_STATS = (.5, .08)
+
+OFFSET_DRAG_DISTANCE = .56
+
+OFFSET_RETURN_TO_GAME_AREA = (.17, .92, .8, .97)
+OFFSET_MIDDLE_RETURN_TO_GAME = (.5, .945)
+
+OFFSET_FLOATIING_DIAMOND_AREA = (.3, .15, .67, .37)
+
+OFFSET_CENTER_OF_TOWER = (.485,.255)
+
+OFFSET_COPY_STATS = (.81,.85)
+
+OFFSET_UPGRADES_AREA = (.01,.61,.48,.645)
+OFFSET_ATTACK_UPGRADE_BUTTON = (.12, .97)
+OFFSET_DEFENSE_UPGRADE_BUTTON = (.36, .97)
+OFFSET_UTILITY_UPGRADE_BUTTON = (.61, .97)
+
+OFFSET_HEALTH_MAX_AREA = (.28, .72, .45, .745)
+OFFSET_MIDDLE_BUY_HEALTH = ()
+
+# mapping dictionary
+class AreaLabel(str, Enum):
+    RETRY = "RETRY"
+    AD_GEM = "AD GEM CLAIM"
+    MORE_STATS = "MORE STATS"
+    UPGRADE_MENU = "UPGRADE MENU"
+    RETURN_TO_GAME = "RETURN TO GAME"
+
+
+
+TEXTS = {
+    "retry_text": "RETRY",
+    "ad_gem_text": "CLAIM",
+    "more_stats_text": "MORE STATS",
+    "upgrade_menu_text": "UPGRADES",
+    "return_to_game_text": "Tap To Return To Game"
+}
+
+
+AREAS = {
+    AreaLabel.RETRY: (OFFSET_RETRY_BUTTON_AREA, TEXTS["retry_text"]),
+    AreaLabel.AD_GEM: (OFFSET_AD_GEM_AREA, TEXTS["ad_gem_text"]),
+    AreaLabel.MORE_STATS: (OFFSET_MORE_STATS_AREA, TEXTS["more_stats_text"]),
+    AreaLabel.UPGRADE_MENU: (OFFSET_UPGRADES_AREA, TEXTS["upgrade_menu_text"]),
+    AreaLabel.RETURN_TO_GAME: (OFFSET_RETURN_TO_GAME_AREA, TEXTS["return_to_game_text"])
+}
