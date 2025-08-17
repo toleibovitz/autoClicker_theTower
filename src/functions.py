@@ -61,6 +61,10 @@ def get_coords(
         offsets: Either:
             - (x_ratio, y_ratio) for a single point
             - (x1_ratio, y1_ratio, x2_ratio, y2_ratio) for a rectangle
+        additional_x_offset_needed: Whether to apply scaling to X ratio.
+        additional_y_offset_needed: Whether to apply scaling to Y ratio.
+        additional_x_offset: Multiplier applied to X ratio.
+        additional_y_offset: Multiplier applied to Y ratio.
 
     Returns:
         (x, y) if 2 offsets were given,
@@ -107,6 +111,26 @@ def get_window_dimension(
         app: str, 
         dimension: Literal["all", "rect", "height", "width"]
         ) -> Union[Tuple[int, int, int, int], Tuple[Tuple[int, int, int, int], int, int], int, None]:
+    
+    """
+    Retrieve dimensions of a window by its title.
+
+    Args:
+        app (str): The window title (case-sensitive).
+        dimension (Literal["all", "rect", "height", "width"]): 
+            - "all": Returns (rect, height, width).
+            - "rect": Returns the full window rectangle (left, top, right, bottom).
+            - "height": Returns only the window height.
+            - "width": Returns only the window width.
+
+    Returns:
+        Union:
+            - Tuple[Tuple[int, int, int, int], int, int]: If "all".
+            - Tuple[int, int, int, int]: If "rect".
+            - int: If "height" or "width".
+            - None: If the window is not found.
+    """
+    
     hwnd = win32gui.FindWindow(None, app)
 
     if hwnd:
@@ -129,6 +153,19 @@ def get_window_dimension(
 
 
 def capture_region_and_check(coords, text_to_look_for, text_to_print):
+    
+    """
+    Capture a screen region and check for a specific text using OCR.
+
+    Args:
+        coords (tuple): Screen region as (left, top, right, bottom).
+        text_to_look_for (str): Text to search for in the captured image.
+        text_to_print (str): Label used in printed messages.
+
+    Returns:
+        bool: True if the text is found, False otherwise.
+    """
+    
     if not coords:
         print("Window not found.")
         return False
@@ -153,6 +190,20 @@ def capture_region_and_check(coords, text_to_look_for, text_to_print):
 
 
 def save_round_stats(file_path, data):
+    
+    """
+    Save round statistics to a CSV file with a timestamped filename.
+
+    Args:
+        file_path (str): Directory where the CSV file should be saved.
+        data (str): Raw stats data as tab-delimited lines.
+
+    Side Effects:
+        Creates a CSV file in the specified directory. 
+        The filename includes the current timestamp (CST, UTC-6).
+        Prints an exception message if file saving fails.
+    """
+    
     lines = data.strip().split("\n")
     rows = [line.split("\t") for line in lines]
     tz_offset = timezone(timedelta(hours=-6))
@@ -171,6 +222,20 @@ def save_round_stats(file_path, data):
 
 def click_circle(bounds, tower_center, radius_px, clicks=8, delay=0.1):
     
+    """
+    Simulate mouse clicks in a circular pattern around a tower center.
+
+    Args:
+        bounds (tuple): Not currently used (kept for compatibility).
+        tower_center (tuple): Relative tower center as (x_ratio, y_ratio).
+        radius_px (int): Radius of the circle in pixels.
+        clicks (int, optional): Number of clicks around the circle. Default is 8.
+        delay (float, optional): Delay between clicks in seconds. Default is 0.1.
+
+    Side Effects:
+        Moves the mouse and performs clicks using pyautogui.
+    """
+
     rect, height, width =  get_window_dimension(APP, dimension="all")
     left, top, right, bottom = rect
     tower_x = left + tower_center[0] * width
@@ -186,6 +251,17 @@ def click_circle(bounds, tower_center, radius_px, clicks=8, delay=0.1):
 
 
 def check_area(label: AreaLabel) -> bool:
+    
+    """
+    Check a predefined screen area for specific text.
+
+    Args:
+        label (AreaLabel): The area label defined in AREAS mapping.
+
+    Returns:
+        bool: True if the text associated with the area is found, False otherwise.
+    """
+    
     offsets, text = AREAS[label]
     coords = get_coords(APP, offsets)
     return capture_region_and_check(coords, text, label)
