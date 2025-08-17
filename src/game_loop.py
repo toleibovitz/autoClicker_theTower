@@ -27,7 +27,7 @@ def main_game_loop(stop_event):
 
 
         # check if retry is shown
-        elif check_area(AreaLabel.RETRY):
+        if check_area(AreaLabel.RETRY):
             if check_area(AreaLabel.MORE_STATS):
                 # move to more stats button
                 more_stats_coords = get_coords(APP, OFFSET_MIDDLE_OF_MORE_STATS_BUTTON)

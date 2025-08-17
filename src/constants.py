@@ -65,7 +65,7 @@ TEXTS = {
     "retry_text": "RETRY",
     "ad_gem_text": "CLAIM",
     "more_stats_text": "MORE STATS",
-    "upgrade_menu_text": "UPGRADES",
+    "upgrade_menu_text": "UPGRADE",
     "return_to_game_text": "Tap To Return To Game"
 }
 
