@@ -46,7 +46,11 @@ def move_and_click(
 
 def get_coords(
         app: str, 
-        offsets: tuple, 
+        offsets: tuple,
+        additional_x_offset_needed: bool = False,
+        additional_y_offset_needed: bool = False,
+        additional_x_offset: float = 1.0,
+        additional_y_offset: float = 1.0,  
         ) -> Union[Tuple[int, int], Tuple[int, int, int, int], None]:
     
     """
@@ -72,10 +76,14 @@ def get_coords(
         width = right - left
         height = bottom - top
 
+        x = round(left + (width * offsets[0]))
+        y = round(top + height * offsets[1])
+        
         if len(offsets) == 2:
-            x = round(left + (width * offsets[0]))
-            y = round(top + height * offsets[1])
-
+            if additional_x_offset_needed:
+                x *= additional_x_offset
+            if additional_y_offset_needed:
+                y *= additional_y_offset
             return (x, y)
         
         elif len(offsets) == 4:
@@ -83,7 +91,12 @@ def get_coords(
             y1 = round(top + height * offsets[1])
             x2 = round(left + (width * offsets[2]))
             y2 = round(top + height * offsets[3])
-
+            if additional_x_offset_needed:
+                x1 *= additional_x_offset
+                x2 *= additional_x_offset
+            if additional_y_offset_needed:
+                y1 *= additional_y_offset
+                y2 *= additional_y_offset  
             return (x1, y1, x2, y2)
     
     return None
