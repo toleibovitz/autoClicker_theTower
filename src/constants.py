@@ -1,8 +1,6 @@
 from enum import Enum
 
 
-
-
 # (x, y) or (left, top, right, bottom)
 # Constants for the various places in the app
 APP = "BlueStacks App Player 1"
@@ -46,8 +44,8 @@ OFFSET_DEFENSE_UPGRADE_BUTTON = (.36, .97)
 OFFSET_UTILITY_UPGRADE_BUTTON = (.61, .97)
 
 OFFSET_HEALTH_MAX_AREA = (.28, .72, .45, .745)
-OFFSET_MIDDLE_BUY_HEALTH = ()
-
+OFFSET_BUY_HEALTH = (.36, .69)
+OFFSET_HEALTH_UPGRADE_LABEL = (.04, .69, .18, .73)
 OFFSET_NEW_HIGHEST_WAVE = (.34, .3, .64, .34)
 
 
@@ -58,7 +56,8 @@ class AreaLabel(str, Enum):
     MORE_STATS = "MORE STATS"
     UPGRADE_MENU = "UPGRADE MENU"
     RETURN_TO_GAME = "RETURN TO GAME"
-
+    HEALTH = "HEALTH"
+    HEALTH_MAX = "Max"
 
 
 TEXTS = {
@@ -66,7 +65,9 @@ TEXTS = {
     "ad_gem_text": "CLAIM",
     "more_stats_text": "MORE STATS",
     "upgrade_menu_text": "UPGRADE",
-    "return_to_game_text": "Tap To Return To Game"
+    "return_to_game_text": "Tap To Return To Game",
+    "health": "Health",
+    "max": "Max"
 }
 
 
@@ -75,5 +76,13 @@ AREAS = {
     AreaLabel.AD_GEM: (OFFSET_AD_GEM_AREA, TEXTS["ad_gem_text"]),
     AreaLabel.MORE_STATS: (OFFSET_MORE_STATS_AREA, TEXTS["more_stats_text"]),
     AreaLabel.UPGRADE_MENU: (OFFSET_UPGRADES_AREA, TEXTS["upgrade_menu_text"]),
-    AreaLabel.RETURN_TO_GAME: (OFFSET_RETURN_TO_GAME_AREA, TEXTS["return_to_game_text"])
+    AreaLabel.RETURN_TO_GAME: (OFFSET_RETURN_TO_GAME_AREA, TEXTS["return_to_game_text"]),
+    AreaLabel.HEALTH: (OFFSET_HEALTH_UPGRADE_LABEL, TEXTS["health"]),
+    AreaLabel.HEALTH_MAX: (OFFSET_HEALTH_MAX_AREA, TEXTS["max"])
+}
+
+UPGRADE_SECTIONS = {
+    "DEFENSE": ["Health", "Regen"],
+    "ATTACK": ["Damage"],
+    "UTILITY": ["Enemy", "Level", "Skip"]
 }

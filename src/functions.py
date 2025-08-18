@@ -9,8 +9,18 @@ import numpy as np
 from datetime import datetime, timedelta, timezone
 import math
 import csv
-from constants import APP, AREAS, AreaLabel
+from src.constants import APP, AREAS, TEXTS, AreaLabel
 from icecream import ic
+
+def buy_upgrade(upgrade_label: AreaLabel, max_label: AreaLabel,  click_offsets: tuple):
+    is_text_shown = check_area(upgrade_label)
+    is_max_shown = check_area(max_label)
+    if is_text_shown and not is_max_shown:
+        coords = get_coords(APP, click_offsets)
+        move_and_click(coords, click=False)
+        print("For now, SOMETHING was bought")
+    else:
+        print("For now, nothing was bought")
 
 def move_and_click(
         coords: Union[tuple, None],  
@@ -152,7 +162,7 @@ def get_window_dimension(
 
 
 
-def capture_region_and_check(coords, text_to_look_for, text_to_print):
+def capture_region_and_check(coords, text_to_look_for):
     
     """
     Capture a screen region and check for a specific text using OCR.
@@ -160,7 +170,6 @@ def capture_region_and_check(coords, text_to_look_for, text_to_print):
     Args:
         coords (tuple): Screen region as (left, top, right, bottom).
         text_to_look_for (str): Text to search for in the captured image.
-        text_to_print (str): Label used in printed messages.
 
     Returns:
         bool: True if the text is found, False otherwise.
@@ -182,10 +191,10 @@ def capture_region_and_check(coords, text_to_look_for, text_to_print):
     text_read = pytesseract.image_to_string(img)
     
     if text_to_look_for in text_read.strip():
-        print(f"{text_to_print} Found")
+        print(f"{text_to_look_for} Found")
         return True
     else:
-        print(f"{text_to_print} NOT Found")
+        print(f"{text_to_look_for} NOT Found")
         return False
 
 
@@ -264,4 +273,4 @@ def check_area(label: AreaLabel) -> bool:
     
     offsets, text = AREAS[label]
     coords = get_coords(APP, offsets)
-    return capture_region_and_check(coords, text, label)
+    return capture_region_and_check(coords, text)
