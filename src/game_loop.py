@@ -11,24 +11,25 @@ def main_game_loop(stop_event):
     
     retry_clicked = 0
     ad_gem_clicked = 0
-
+    APP = get_current_game_window()
+    print(f"GAME NAME: {APP}")
 
     while not stop_event.is_set():
         loop_start = time.time()
 
         # check if return to game is show
-        if check_area(AreaLabel.RETURN_TO_GAME):
+        if check_area(APP, AreaLabel.RETURN_TO_GAME):
             return_to_game_button_coords = get_coords(APP, OFFSET_MIDDLE_RETURN_TO_GAME)
             move_and_click(return_to_game_button_coords, click=True)
 
-        if not check_area(AreaLabel.UPGRADE_MENU):
+        if not check_area(APP, AreaLabel.UPGRADE_MENU):
             attack_upgrade_button_coords = get_coords(APP, OFFSET_ATTACK_UPGRADE_BUTTON)
             move_and_click(attack_upgrade_button_coords, click=True)
 
 
         # check if retry is shown
-        if check_area(AreaLabel.RETRY):
-            if check_area(AreaLabel.MORE_STATS):
+        if check_area(APP, AreaLabel.RETRY):
+            if check_area(APP, AreaLabel.MORE_STATS):
                 # move to more stats button
                 more_stats_coords = get_coords(APP, OFFSET_MIDDLE_OF_MORE_STATS_BUTTON)
                 move_and_click(more_stats_coords, click=True)
@@ -50,13 +51,13 @@ def main_game_loop(stop_event):
                 print(f"Retry Clicked {retry_clicked} time(s)")
         
         # check if ad gem is shown
-        elif check_area(AreaLabel.AD_GEM):
+        elif check_area(APP, AreaLabel.AD_GEM):
             ad_gem_middle = get_coords(APP, OFFSET_MIDDLE_OF_AD_GEM_BUTTON)
             move_and_click(ad_gem_middle, click=True)
             rect = get_window_dimension(APP, "rect")
             height = cast(int, get_window_dimension(APP, dimension="height"))
             big_radius = height * 0.10  # 20% of window height
-            click_circle(rect, OFFSET_CENTER_OF_TOWER, big_radius, clicks=20, delay=0.001)
+            click_circle(APP, rect, OFFSET_CENTER_OF_TOWER, big_radius, clicks=20, delay=0.001)
             ad_gem_clicked += 1
             print(f"Ad Gem Clicked {ad_gem_clicked} time(s)")
         else:

@@ -9,8 +9,23 @@ import numpy as np
 from datetime import datetime, timedelta, timezone
 import math
 import csv
-from constants import APP, AREAS, AreaLabel
+from constants import AREAS, AreaLabel
 from icecream import ic
+
+
+def get_current_game_window() -> str:
+    windows = pyautogui.getAllWindows()
+    results = []
+    name = "BlueStacks App Player"
+    for window in windows:
+        if name in window.title:
+            results.append(window.title)
+
+    if len(results) == 1:
+        return results[0] 
+    else:
+        raise ValueError("Too many windows found. Please only have one open window.")
+
 
 def move_and_click(
         coords: Union[tuple, None],  
@@ -220,7 +235,7 @@ def save_round_stats(file_path, data):
     except Exception as e:
         print(e)
 
-def click_circle(bounds, tower_center, radius_px, clicks=8, delay=0.1):
+def click_circle(app, bounds, tower_center, radius_px, clicks=8, delay=0.1):
     
     """
     Simulate mouse clicks in a circular pattern around a tower center.
@@ -236,7 +251,7 @@ def click_circle(bounds, tower_center, radius_px, clicks=8, delay=0.1):
         Moves the mouse and performs clicks using pyautogui.
     """
 
-    rect, height, width =  get_window_dimension(APP, dimension="all")
+    rect, height, width =  get_window_dimension(app, dimension="all")
     left, top, right, bottom = rect
     tower_x = left + tower_center[0] * width
     tower_y = top + tower_center[1] * height
@@ -250,7 +265,7 @@ def click_circle(bounds, tower_center, radius_px, clicks=8, delay=0.1):
         time.sleep(delay)
 
 
-def check_area(label: AreaLabel) -> bool:
+def check_area(app: str, label: AreaLabel) -> bool:
     
     """
     Check a predefined screen area for specific text.
@@ -263,5 +278,5 @@ def check_area(label: AreaLabel) -> bool:
     """
     
     offsets, text = AREAS[label]
-    coords = get_coords(APP, offsets)
+    coords = get_coords(app, offsets)
     return capture_region_and_check(coords, text, label)

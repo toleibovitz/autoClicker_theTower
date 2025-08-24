@@ -5,7 +5,7 @@ from enum import Enum
 
 # (x, y) or (left, top, right, bottom)
 # Constants for the various places in the app
-APP = "BlueStacks App Player 1"
+# APP = "BlueStacks App Player 1"
 RETRY_TIME = 120
 
 OFFSET_MIDDLE_OF_RETRY_BUTTON = (.25, .74)
