@@ -6,6 +6,10 @@ from enum import Enum
 # (x, y) or (left, top, right, bottom)
 # Constants for the various places in the app
 # APP = "BlueStacks App Player 1"
+
+# This offset is used if the ui displays, "New Highest Wave"
+OFFSET_RATIO_NEW_HIGHEST_WAVE = 1.03
+
 RETRY_TIME = 120
 
 OFFSET_MIDDLE_OF_RETRY_BUTTON = (.25, .74)
@@ -58,7 +62,7 @@ class AreaLabel(str, Enum):
     MORE_STATS = "MORE STATS"
     UPGRADE_MENU = "UPGRADE MENU"
     RETURN_TO_GAME = "RETURN TO GAME"
-
+    NEW_HIGHEST_WAVE = "New Highest Wave"
 
 
 TEXTS = {
@@ -66,7 +70,8 @@ TEXTS = {
     "ad_gem_text": "CLAIM",
     "more_stats_text": "MORE STATS",
     "upgrade_menu_text": "UPGRADE",
-    "return_to_game_text": "Tap To Return To Game"
+    "return_to_game_text": "Tap To Return To Game",
+    "new_highest_wave": "New Highest Wave"
 }
 
 
@@ -75,5 +80,6 @@ AREAS = {
     AreaLabel.AD_GEM: (OFFSET_AD_GEM_AREA, TEXTS["ad_gem_text"]),
     AreaLabel.MORE_STATS: (OFFSET_MORE_STATS_AREA, TEXTS["more_stats_text"]),
     AreaLabel.UPGRADE_MENU: (OFFSET_UPGRADES_AREA, TEXTS["upgrade_menu_text"]),
-    AreaLabel.RETURN_TO_GAME: (OFFSET_RETURN_TO_GAME_AREA, TEXTS["return_to_game_text"])
+    AreaLabel.RETURN_TO_GAME: (OFFSET_RETURN_TO_GAME_AREA, TEXTS["return_to_game_text"]),
+    AreaLabel.NEW_HIGHEST_WAVE: (OFFSET_NEW_HIGHEST_WAVE, TEXTS["new_highest_wave"])
 }

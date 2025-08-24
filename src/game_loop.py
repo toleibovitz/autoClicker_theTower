@@ -28,6 +28,26 @@ def main_game_loop(stop_event):
 
 
         # check if retry is shown
+        if check_area(APP, AreaLabel.NEW_HIGHEST_WAVE):
+            # move to more stats button
+                more_stats_coords = get_coords(APP, OFFSET_MIDDLE_OF_MORE_STATS_BUTTON, additional_y_offset_needed=True, additional_y_offset=OFFSET_RATIO_NEW_HIGHEST_WAVE)
+                move_and_click(more_stats_coords, click=True)
+
+                # # copy round_stat
+                copy_stats_button_coords = get_coords(APP, OFFSET_COPY_STATS)
+                move_and_click(copy_stats_button_coords, click=True)
+                round_stats = pyperclip.paste()
+                save_round_stats("round_stats", round_stats)
+                
+                # # click outside of Round Stats
+                outside_round_stats_coords = get_coords(APP, OFFSET_OUTSIDE_ROUND_STATS)
+                move_and_click(outside_round_stats_coords, click=True)
+                
+                # # move to retry and click
+                retry_button_coords = get_coords(APP, OFFSET_MIDDLE_OF_RETRY_BUTTON, additional_y_offset_needed=True, additional_y_offset=OFFSET_RATIO_NEW_HIGHEST_WAVE)
+                move_and_click(retry_button_coords, click=True)
+                retry_clicked += 1
+                print(f"Retry Clicked {retry_clicked} time(s)")
         if check_area(APP, AreaLabel.RETRY):
             if check_area(APP, AreaLabel.MORE_STATS):
                 # move to more stats button

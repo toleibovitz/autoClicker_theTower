@@ -277,6 +277,10 @@ def check_area(app: str, label: AreaLabel) -> bool:
         bool: True if the text associated with the area is found, False otherwise.
     """
     
+
+
     offsets, text = AREAS[label]
     coords = get_coords(app, offsets)
     return capture_region_and_check(coords, text, label)
+
+
