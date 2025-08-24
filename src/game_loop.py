@@ -21,7 +21,8 @@ def main_game_loop(stop_event):
         if check_area(APP, AreaLabel.RETURN_TO_GAME):
             return_to_game_button_coords = get_coords(APP, OFFSET_MIDDLE_RETURN_TO_GAME)
             move_and_click(return_to_game_button_coords, click=True)
-
+            continue
+        
         if not check_area(APP, AreaLabel.UPGRADE_MENU):
             attack_upgrade_button_coords = get_coords(APP, OFFSET_ATTACK_UPGRADE_BUTTON)
             move_and_click(attack_upgrade_button_coords, click=True)
