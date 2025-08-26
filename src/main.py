@@ -7,18 +7,29 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 
 import sys
 import threading
-from PySide6.QtCore import QThread
+from PySide6.QtCore import QThread, Signal
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLineEdit, QHBoxLayout, QVBoxLayout, QLabel
 
-APP = get_current_game_window()
 
 class GameLoopThread(QThread):
+    ad_gem_clicked = Signal(int)
+    
     def __init__(self):
         super().__init__()
         self.stop_event = threading.Event()
         
+
     def run(self):
-        main_game_loop(self.stop_event)
+        event_handlers = {
+            "ad_gem_clicked": lambda payload: self.ad_gem_clicked.emit(int(payload.get("count", 0)))
+        }
+
+        def notify(event: str, payload: dict):
+            handler = event_handlers.get(event)
+            if handler:
+                handler(payload)
+
+        main_game_loop(self.stop_event, notify)
 
     def stop(self):
         self.stop_event.set()
@@ -60,6 +71,7 @@ class AutoClicker(QMainWindow):
         if checked:
             self.auto_clicker_button.setText("Stop Auto Clicker")
             self.game_thread = GameLoopThread()
+            self.game_thread.ad_gem_clicked.connect(self.on_ad_gem_clicked)
             self.game_thread.start()
         else:
             self.auto_clicker_button.setText("Start Auto Clicker")
@@ -67,11 +79,8 @@ class AutoClicker(QMainWindow):
                 self.game_thread.stop()
                 self.game_thread = None
 
-    def update_ad_gems_clicked(self):
-        current = self.ad_gems_clicked_count.text()
-        current = int(current)
-        current += 1
-        self.ad_gems_clicked_count.setText(str(current))
+    def on_ad_gem_clicked(self, count: int):
+        self.ad_gems_clicked_count.setText(str(count))
 
     # def get_current_gems(self):
     #     coords = get_coords(APP, OFFSET_TOTAL_GEMS_AREA)

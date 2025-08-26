@@ -4,7 +4,7 @@ import pyperclip
 from typing import cast
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-def main_game_loop(stop_event):
+def main_game_loop(stop_event, notify):
     
     retry_clicked = 0
     ad_gem_clicked = 0
@@ -71,12 +71,14 @@ def main_game_loop(stop_event):
         # check if ad gem is shown
         elif check_area(APP, AreaLabel.AD_GEM):
             ad_gem_middle = get_coords(APP, OFFSET_MIDDLE_OF_AD_GEM_BUTTON)
-            move_and_click(ad_gem_middle, click=True)
+            move_and_click(ad_gem_middle, click=False)
             rect = get_window_dimension(APP, "rect")
             height = cast(int, get_window_dimension(APP, dimension="height"))
             big_radius = height * 0.10  # 20% of window height
             click_circle(APP, rect, OFFSET_CENTER_OF_TOWER, big_radius, clicks=20, delay=0.001)
             ad_gem_clicked += 1
+            if notify:
+                notify("ad_gem_clicked", {"count": ad_gem_clicked})
             print(f"Ad Gem Clicked {ad_gem_clicked} time(s)")
         else:
             print(f"No Retry or Ad Gem found. Trying again in {RETRY_TIME} seconds...")

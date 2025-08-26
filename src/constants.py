@@ -10,7 +10,7 @@ from enum import Enum
 # This offset is used if the ui displays, "New Highest Wave"
 OFFSET_RATIO_NEW_HIGHEST_WAVE = 1.03
 
-RETRY_TIME = 120
+RETRY_TIME = 10
 
 OFFSET_MIDDLE_OF_RETRY_BUTTON = (.25, .74)
 OFFSET_RETRY_BUTTON_AREA = (.09, .71, .45, .77)
