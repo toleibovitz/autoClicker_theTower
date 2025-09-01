@@ -149,7 +149,7 @@ def main_game_loop(stop_event):
             move_and_click(ad_gem_middle, click=True)
             rect = get_window_dimension(APP, "rect")
             height = cast(int, get_window_dimension(APP, dimension="height"))
-            big_radius = height * 0.10  # 20% of window height
+            big_radius = height * 0.10  
             click_circle(APP, rect, OFFSET_CENTER_OF_TOWER, big_radius, clicks=20, delay=0.001)
             ad_gem_clicked += 1
             window.update_ad_gems_clicked()
