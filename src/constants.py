@@ -1,8 +1,5 @@
 from enum import Enum
 
-
-
-
 # (x, y) or (left, top, right, bottom)
 # Constants for the various places in the app
 # APP = "BlueStacks App Player 1"
@@ -55,6 +52,9 @@ OFFSET_MIDDLE_BUY_HEALTH = ()
 OFFSET_NEW_HIGHEST_WAVE = (.34, .3, .64, .34)
 
 OFFSET_TOTAL_GEMS_AREA = (.08, .12, .18, .15)
+
+OFFSET_NUKE_AREA = (.02, .42, .16, .48)
+
 
 # mapping dictionary
 class AreaLabel(str, Enum):

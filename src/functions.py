@@ -9,7 +9,7 @@ import numpy as np
 from datetime import datetime, timedelta, timezone
 import math
 import csv
-from constants import AREAS, AreaLabel
+from src.constants import AREAS, AreaLabel
 from icecream import ic
 
 
@@ -284,3 +284,13 @@ def check_area(app: str, label: AreaLabel) -> bool:
     return capture_region_and_check(coords, text, label)
 
 
+def take_screen_shot(coords, fname):
+    left, top, right, bottom = coords
+    width = right - left
+    height = bottom - top
+    
+    
+    with mss.mss() as sct:
+        monitor = {"top": top, "left": left, "width": width, "height": height}
+        image = sct.grab(monitor)
+        mss.tools.to_png(image.rgb, image.size, output=f"{fname}.png")
